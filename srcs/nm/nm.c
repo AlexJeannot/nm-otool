@@ -47,13 +47,11 @@ void *getMap(char *input)
 
 int main(int argc, char **argv)
 {
-    uint64_t offset;
     void *file;
     t_env env;
 
     bzero(&env, sizeof(env));
     env.prog = NM;
-    offset = 0;
 
     parse_args(argc, argv, &env);
 
@@ -62,7 +60,6 @@ int main(int argc, char **argv)
     parseHeader(&env, file);
     display_header(&env);
 
-    offset += (env.arch == ARCH_32) ? sizeof(struct mach_header) : sizeof(struct mach_header_64);
     parseLoadCommands(&env, file);
 
     sortSymbolList(&env);

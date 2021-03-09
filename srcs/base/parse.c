@@ -14,6 +14,13 @@ void parseHeader(t_env *env, void *file)
         env->r_bits = R_BITS;
     }
 
+    uint64_t *test = file;
+    if (*test == MH_LIB)
+        printf("LIBBBBBBBB\n");
+    printf("MH_LIB = %llu\n", (uint64_t)MH_LIB);
+    printf("*test = %llu\n", *test);
+
+
     if (env->arch == 0)
         errorExit("Invalid magic number\n", NULL);
 }
@@ -54,15 +61,20 @@ void parseSegment32(void* l_cmd, t_env *env)
 
     offset = sizeof(struct segment_command);
     segment = (struct segment_command *)l_cmd;
+    printf("parseSegment32 pre for\n");
+    printf("segment->nsects = %d\n", segment->nsects);
     for (int count = 0; count < segment->nsects; count++) {
+        printf("parseSegment32 for %d\n", count);
         section = (struct section *)&(l_cmd[offset]);
         if (isNm(env)) {
             if (!(new_section = (t_section *)malloc(sizeof(t_section))))
                 errorExit("Section malloc", NULL);
             bzero(new_section, sizeof(t_section));
             new_section->id = nb_sect++;
-            strncpy(new_section->segname, section->segname, strlen(section->segname));
-            strncpy(new_section->sectname, section->sectname, strlen(section->sectname));
+            printf("AVANT STRNCPY\n");
+            strncpy(new_section->segname, section->segname, 15);
+            strncpy(new_section->sectname, section->sectname, 15);
+            printf("APRES STRNCPY\n");
             new_section->next = NULL;
             addSectionList(env, new_section);
         }
@@ -91,11 +103,10 @@ void parseSegment64(void* l_cmd, t_env *env)
                 errorExit("Section malloc", NULL);
             bzero(new_section, sizeof(t_section));
             new_section->id = nb_sect++;
-            strncpy(new_section->segname, section->segname, strlen(section->segname));
-            strncpy(new_section->sectname, section->sectname, strlen(section->sectname));
+            strncpy(new_section->segname, section->segname, 15);
+            strncpy(new_section->sectname, section->sectname, 15);
             new_section->next = NULL;
             addSectionList(env, new_section);
-
         }
         else if (strncmp(section->sectname, "__text", 6) == 0) {
             env->data.section.text_64 = section;
@@ -197,7 +208,9 @@ void parseLoadCommands(t_env *env, void *file)
     int offset = 0;
 
     offset += (env->arch == ARCH_32) ? sizeof(struct mach_header) : sizeof(struct mach_header_64);
+    printf("parseLoadCommands pre for\n");
     for (int count = 0; count < env->header->ncmds; count++) {
+        printf("parseLoadCommands for %d\n", count);
         l_cmd = (struct load_command *)&(file[offset]);
         switch (l_cmd->cmd) {
             case (LC_SEGMENT):      parseSegment32(l_cmd, env);   break;

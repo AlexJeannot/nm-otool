@@ -1,8 +1,9 @@
 
-#include "stdlib.h"
-#include "stdio.h"
-
-int global = 0;
+int global_classic_int_init = 1;
+int global_classic_int_ninit;
+// int8_t global_small_int;
+const char global_const_char_array[4] = "oui";
+char global_char_array[5000];
 
 int add_five(int nb)
 {
@@ -16,40 +17,29 @@ void add_five_addr(int *nb)
     *nb += 5;
 }
 
-int com;
-int8_t little_ext;
-const char const_test2[4] = "oui";
-char oui[5000];
-
 int main()
 {
-    int8_t little_inter;
-    int int_main;
-    int *m;
+    // int8_t small_int;
+    int classic_int;
+    int *ptr_int;
     int *m2;
-    char oui[5000];
+    char char_array[5000];
     char *test = "test";
-    const int c = 2;
-    const char cchar[3] = "er";
-    static int a = 1;
-    static int b;
-    char lala;
-    int common;
-    const char const_test[4] = "oui";
+    const int const_int = 2;
+    const char const_char[3] = "AA";
+    static int static_int_init = 1;
+    static int static_int_ninit;
+    char simple_char;
 
-    int_main = 10;
-    int_main = 22;
-    int_main = add_five(int_main);
-    add_five_addr(&int_main);
+    classic_int = 10;
+    classic_int = 22;
+    classic_int = add_five(classic_int);
+    add_five_addr(&classic_int);
 
-    if (!(m = (int*)malloc(sizeof(int))))
-        return (0);
-
-    // if (!(m2 = (int*)malloc(sizeof(int) * 1500)))
+    // if (!(ptr_int = (int*)malloc(sizeof(int))))
     //     return (0);
 
-    // free(m);
-    // free(m2);
-    printf("int_main = %d\n", int_main);
+    // free(ptr_int);
+    // printf("classic_int = %d\n", classic_int);
 
 }

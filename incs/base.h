@@ -22,6 +22,7 @@
 # define FALSE 0
 # define SECTION_LIST 1
 # define SYMBOL_LIST 2
+# define MH_LIB 738142165265366049
 
 typedef struct s_section
 {
