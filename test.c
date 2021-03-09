@@ -172,14 +172,14 @@ void process_symtab(void *load, void *file)
         printf("symbol->n_sect = %u\n", symbol.n_sect);
         printf("symbol->n_desc = %u\n", symbol.n_desc);
         printf("symbol->n_value = %llu\n", symbol.n_value);
-
-        printf("\033[38;5;99m+++++++++++++++++++++++++++++++\033[0m\n");
         offset += sizeof(struct nlist_64);
         bzero(&symbol, sizeof(symbol));
         memcpy(&symbol, &file[symtab->symoff + offset], sizeof(symbol));
 
 
     }
+        printf("\033[38;5;99m+++++++++++++++++++++++++++++++\033[0m\n");
+
 }
 
 int main()
@@ -204,6 +204,7 @@ int main()
     case S_IFSOCK: printf("socket\n");                  break;
     default:       printf("unknown?\n");                break;
     }
+    printf("sb.st_size = %lld\n", sb.st_size);
 
     if ((file = mmap(NULL, sb.st_size, PROT_READ, MAP_PRIVATE, fd, 0)) == MAP_FAILED)
         error_exit("MMAP");
@@ -218,7 +219,6 @@ int main()
         default:            printf("unknown?\n");       break;
     }
 
-    printf("header->magic type: \n");
     printf("header->cputype = %d\n", header->cputype);
     printf("header->cpusubtype = %d\n", header->cpusubtype);
     printf("header->filetype = %d\n", header->filetype);

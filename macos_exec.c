@@ -16,8 +16,14 @@ void add_five_addr(int *nb)
     *nb += 5;
 }
 
+int com;
+int8_t little_ext;
+const char const_test2[4] = "oui";
+char oui[5000];
+
 int main()
 {
+    int8_t little_inter;
     int int_main;
     int *m;
     int *m2;
@@ -27,14 +33,17 @@ int main()
     const char cchar[3] = "er";
     static int a = 1;
     static int b;
+    char lala;
+    int common;
+    const char const_test[4] = "oui";
 
     int_main = 10;
     int_main = 22;
     int_main = add_five(int_main);
     add_five_addr(&int_main);
 
-    // if (!(m = (int*)malloc(sizeof(int))))
-    //     return (0);
+    if (!(m = (int*)malloc(sizeof(int))))
+        return (0);
 
     // if (!(m2 = (int*)malloc(sizeof(int) * 1500)))
     //     return (0);
