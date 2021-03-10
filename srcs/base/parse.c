@@ -19,7 +19,24 @@ void parseHeader(t_env *env, void *file)
         printf("LIBBBBBBBB\n");
     printf("MH_LIB = %llu\n", (uint64_t)MH_LIB);
     printf("*test = %llu\n", *test);
+    printf("sizeof header lib = %lu\n", sizeof(t_libhdr));
+    int offset = 8;
 
+    t_libhdr *libheader = (t_libhdr *)&file[offset];
+    printf("size = %s\n", libheader->size);
+    char size_str[9];
+    bzero(&size_str, 9);
+    strncpy(&size_str[0], &libheader->size[0], 8);
+    int32_t size = atoi(libheader->size);
+    printf("size_str = %s\n", size_str);
+    printf("size int = %d\n", size);
+
+    char *testoffset = &file[sizeof(t_libhdr) + size + offset + sizeof(t_libhdr)];
+    printf("testoffset = %s\n", testoffset);
+    printf("strlen(testoffset) = %lu\n", strlen(testoffset));
+    offset += (sizeof(t_libhdr) + size + sizeof(t_libhdr) + 20);
+    struct mach_header_64 *lib_mach = (struct mach_header_64 *)&file[offset];
+    printf("lib_mach->magic = 0x%x\n", lib_mach->magic);
 
     if (env->arch == 0)
         errorExit("Invalid magic number\n", NULL);

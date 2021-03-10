@@ -42,6 +42,17 @@ typedef struct s_symbol
     struct s_symbol *next;
 } t_symbol;
 
+typedef struct s_libhdr
+{
+    char name[16];
+    char ts[12];
+    char user_id[6];
+    char group_id[6];
+    char mode[8];
+    char size[8];
+    char end[4];
+} t_libhdr;
+
 typedef struct s_env {
 
     struct mach_header_64 *header;
