@@ -12,6 +12,7 @@
 # include <mach-o/loader.h>
 # include <mach-o/fat.h>
 # include <mach-o/nlist.h>
+# include <ar.h>
 
 # define ARCH_32 32
 # define ARCH_64 64
@@ -41,6 +42,12 @@ typedef struct s_symbol
     int8_t       displayed;
     struct s_symbol *next;
 } t_symbol;
+
+typedef struct s_lib_obj
+{
+    void *addr;
+    struct s_lib_obj *next;
+} t_lib_obj;
 
 typedef struct s_libhdr
 {
@@ -72,6 +79,8 @@ typedef struct s_env {
         } symbol;
     } data;
     t_section *section_list;
+    t_lib_obj *lib_objs;
+    uint64_t file_size;
 
 } t_env;
 
@@ -85,5 +94,6 @@ void displaySymbols(const t_env *env);
 void    sortSymbolList(t_env * env);
 int8_t isNm(const t_env *env);
 int8_t isOtool(const t_env *env);
+int8_t  isTypeDef(char c);
 
 #endif

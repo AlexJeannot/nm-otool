@@ -7,3 +7,7 @@ int8_t isNm(const t_env *env) {
 int8_t isOtool(const t_env *env) {
     return (env->prog == OTOOL);
 }
+
+int8_t  isTypeDef(char c) {
+    return (c != 'U' && c != '?');
+}

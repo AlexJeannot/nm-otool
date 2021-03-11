@@ -55,10 +55,10 @@ $(BASE_OBJS): | $(BASE_DOBJS)
 # $(EXEC_OBJS): | $(DOBJS)
 
 $(NM_DOBJS):
-	mkdir $(NM_DOBJS)
+	mkdir -p $(NM_DOBJS)
 
 $(BASE_DOBJS):
-	mkdir $(BASE_DOBJS)
+	mkdir -p $(BASE_DOBJS)
 
 $(NM_DOBJS)%.o: $(DSRCS)$(NM_DIR)%.c
 	$(CC) -c $< -o $@
@@ -68,7 +68,7 @@ $(BASE_DOBJS)%.o: $(DSRCS)$(BASE_DIR)%.c
 
 # CLEAR
 clean:
-	$(RM) $(NM_DOBJS) $(BASE_DOBJS)
+	$(RM) ./comp
 
 fclean: clean
 	$(RM) $(NAME)

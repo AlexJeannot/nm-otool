@@ -45,7 +45,7 @@ void displaySymbols(const t_env *env)
     tmp = env->data.symbol.list;
     while (tmp)
     {
-        if (tmp->addr)
+        if (isTypeDef(tmp->type))
             printf("%016llx", tmp->addr);
         else
             printf("                ");

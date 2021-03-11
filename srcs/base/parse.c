@@ -85,7 +85,7 @@ void parseSegment32(void* l_cmd, t_env *env)
         section = (struct section *)&(l_cmd[offset]);
         if (isNm(env)) {
             if (!(new_section = (t_section *)malloc(sizeof(t_section))))
-                errorExit("Section malloc", NULL);
+                errorExit("Section memory allocation", NULL);
             bzero(new_section, sizeof(t_section));
             new_section->id = nb_sect++;
             printf("AVANT STRNCPY\n");
@@ -117,7 +117,7 @@ void parseSegment64(void* l_cmd, t_env *env)
         section = (struct section_64 *)&(l_cmd[offset]);
         if (isNm(env)) {
             if (!(new_section = (t_section *)malloc(sizeof(t_section))))
-                errorExit("Section malloc", NULL);
+                errorExit("Section memory allocation", NULL);
             bzero(new_section, sizeof(t_section));
             new_section->id = nb_sect++;
             strncpy(new_section->segname, section->segname, 15);
@@ -178,7 +178,7 @@ void getSymbols32(void *file, struct symtab_command *sym_cmd, t_env *env)
     for (int count = 0; count < sym_cmd->nsyms; count++) {
         symbol = (struct nlist *)&(file[offset]);
         if (!(new_symbol = (t_symbol *)malloc(sizeof(t_symbol))))
-            errorExit("Symbol malloc", NULL);
+            errorExit("Symbol memory allocation", NULL);
         bzero(new_symbol, sizeof(t_symbol));
         new_symbol->addr = (uint64_t)symbol->n_value;
         new_symbol->type = getSymbolType(env, symbol->n_type, symbol->n_sect, (uint64_t)symbol->n_value);
@@ -199,7 +199,7 @@ void getSymbols64(void *file, struct symtab_command *sym_cmd, t_env *env)
     for (int count = 0; count < sym_cmd->nsyms; count++) {
         symbol = (struct nlist_64 *)&(file[offset]);
         if (!(new_symbol = (t_symbol *)malloc(sizeof(t_symbol))))
-            errorExit("Symbol malloc", NULL);
+            errorExit("Symbol memory allocation", NULL);
         bzero(new_symbol, sizeof(t_symbol));
         new_symbol->addr = symbol->n_value;
         new_symbol->type = getSymbolType(env, symbol->n_type, symbol->n_sect, symbol->n_value);
