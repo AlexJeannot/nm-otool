@@ -69,7 +69,8 @@ void    sortSymbolList(t_env * env)
 
     p_sym = NULL;
     f_sym = env->data.symbol.list;
-    s_sym = f_sym->next;
+    if (f_sym)
+        s_sym = f_sym->next;
     while (f_sym && s_sym) {
         if (strncmp(f_sym->name, s_sym->name, strlen(f_sym->name)) > 0) {
             f_sym->next = s_sym->next;

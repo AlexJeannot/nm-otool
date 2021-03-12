@@ -30,11 +30,11 @@ void getSubFile32(t_env *env, void *file, uint32_t arch_pos)
 
     subfile_offset = ifSwapuInt32(env->fathdr.s_bytes, arch_header->offset);
     if (!(controlOverflow(env->file.size, subfile_offset)))
-        errorExit("Overflow on 32-bits FAT binary subfile header offset", NULL);
+        errorExit("Overflow on 32-bits FAT binary subfile header offset", env->target.name[env->target.id]);
 
     env->file.subsize = (uint64_t)ifSwapuInt32(env->fathdr.s_bytes, arch_header->size);
     if (!(controlOverflow(env->file.size, subfile_offset + env->file.subsize)))
-        errorExit("Overflow on 32-bits FAT binary subfile size", NULL);
+        errorExit("Overflow on 32-bits FAT binary subfile size", env->target.name[env->target.id]);
 
     env->fathdr.subfile = &file[subfile_offset];
 }
@@ -50,11 +50,11 @@ void getSubFile64(t_env *env, void *file, uint32_t arch_pos)
 
     subfile_offset = ifSwapuInt64(env->fathdr.s_bytes, arch_header->offset);
     if (!(controlOverflow(env->file.size, subfile_offset)))
-        errorExit("Overflow on 64-bits FAT binary subfile header offset", NULL);
+        errorExit("Overflow on 64-bits FAT binary subfile header offset", env->target.name[env->target.id]);
 
     env->file.subsize = ifSwapuInt64(env->fathdr.s_bytes, arch_header->size);
     if (!(controlOverflow(env->file.size, subfile_offset + env->file.subsize)))
-        errorExit("Overflow on 64-bits FAT binary subfile size", NULL);
+        errorExit("Overflow on 64-bits FAT binary subfile size", env->target.name[env->target.id]);
 
     env->fathdr.subfile = &file[subfile_offset];
 }

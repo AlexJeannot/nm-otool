@@ -13,12 +13,12 @@ void parse_args(int argc, char **argv, t_env *env)
 {
     int pos = 0;
 
-    if (!(env->target = (char **)malloc(sizeof(char *) * (argc - 1))))
+    if (!(env->target.name = (char **)malloc(sizeof(char *) * (argc - 1))))
         errorExit("Target memory allocation\n", NULL);
-    bzero(&env->target[0], sizeof(char *) * (argc - 1));
+    bzero(&env->target.name[0], sizeof(char *) * (argc - 1));
     for (int count = 1; count < argc; count++) {
         if (argv[count] && argv[count][0] != '-') {
-            env->target[pos] = argv[count];
+            env->target.name[pos] = argv[count];
             pos++;
         }
     }
@@ -67,20 +67,36 @@ void clearSection(t_env *env)
     env->section_list = NULL;
 }
 
+void clearSymbol(t_env *env)
+{
+    t_symbol *prev, *tmp;
+
+    tmp = env->data.symbol.list;
+    while (tmp) {
+        prev = tmp;
+        tmp = tmp->next;
+        free(prev);
+    }
+    env->data.symbol.list = NULL;
+}
+
 void setNextFile(t_env *env)
 {
     clearSection(env);
+    clearSymbol(env);
     bzero(&env->file, sizeof(env->file));
     bzero(&env->data, sizeof(env->data));
     env->arch = 0;
     env->s_bytes = 0;
+    env->nb_sect = 1;
+
 }
 
-void processLib(t_env *env, void *file)
+void processLib(t_env *env, void *file, int8_t file_type)
 {
     t_lib_obj *obj;
     
-    getLibObjList(env, file);
+    getLibObjList(env, file, file_type);
     obj = env->lib_objs;
     while (obj) {
         processSymbol(env, obj->addr);
@@ -100,21 +116,22 @@ int main(int argc, char **argv)
     env.prog = NM;
 
     parse_args(argc, argv, &env);
-
-    for (int nb_files = 0; nb_files < argc - 1; nb_files++) {
-        file = getMap(&env, env.target[nb_files]);
+    env.nb_sect = 1;
+    for (env.target.id = 0; env.target.id < argc - 1; env.target.id++) {
+        file = getMap(&env, env.target.name[env.target.id]);
         if (isFatBinary(&env, file)) {
             for (uint32_t count = 0; count < env.fathdr.n_arch; count++) {
                 (env.fathdr.arch == ARCH_32) ? getSubFile32(&env, file, count) : getSubFile64(&env, file, count);
                 if (isLibrary(env.fathdr.subfile))
-                    processLib(&env, env.fathdr.subfile);
+                    processLib(&env, env.fathdr.subfile, SUB_FILE);
                 else
                     processSymbol(&env, env.fathdr.subfile);
+                env.nb_sect = 1;
             }
         }
         else {
             if (isLibrary(file))
-                processLib(&env, file);
+                processLib(&env, file, MAIN_FILE);
             else
                 processSymbol(&env, file);
         }

@@ -23,6 +23,8 @@
 # define SECTION_LIST 1
 # define SYMBOL_LIST 2
 # define MH_LIB 738142165265366049
+# define MAIN_FILE 1
+# define SUB_FILE 2
 
 typedef struct s_section
 {
@@ -44,6 +46,7 @@ typedef struct s_symbol
 typedef struct s_lib_obj
 {
     void *addr;
+    char *name;
     struct s_lib_obj *next;
 } t_lib_obj;
 
@@ -62,10 +65,17 @@ typedef struct s_file
     uint64_t subsize;
 } t_file;
 
+typedef struct s_target
+{
+    char **name;
+    uint32_t id;
+} t_target;
+
 typedef struct s_env {
 
     struct mach_header_64 *header;
-    char **target;
+    t_target target;
+    uint32_t target_id;
     int8_t arch;
     int8_t s_bytes;
     int8_t prog;
@@ -82,6 +92,7 @@ typedef struct s_env {
         } symbol;
     } data;
     t_section *section_list;
+    uint16_t nb_sect;
     t_lib_obj *lib_objs;
     t_file file;
 } t_env;
@@ -114,7 +125,7 @@ void getSubFile32(t_env *env, void *file, uint32_t arch_pos);
 void getSubFile64(t_env *env, void *file, uint32_t arch_pos);
 
 int8_t isLibrary(void *file);
-void getLibObjList(t_env *env, void *file);
+void getLibObjList(t_env *env, void *file, int8_t file_type);
 // int32_t getObjSize(struct ar_hdr *header);
 
 void clearLib(t_env *env);
