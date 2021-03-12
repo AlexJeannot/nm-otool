@@ -42,79 +42,54 @@ void *getMap(t_env *env, char *input)
         errorExit("File access", input);
     if ((file = mmap(NULL, sb.st_size, PROT_READ, MAP_PRIVATE, fd, 0)) == MAP_FAILED)
         errorExit("Map access", input);
-    env->file_size = sb.st_size;
+    env->file.size = sb.st_size;
     return (file);
 }
 
-int32_t getObjSize(struct ar_hdr *header)
+void processSymbol(t_env *env, void *addr)
 {
-    char        hdr_size[11];
-    int32_t     size = 0;
-
-    bzero(&hdr_size, 11);
-    strncpy(&hdr_size[0], &header->ar_size[0], 10);
-    if ((size = atoi(hdr_size)) < 0)
-        errorExit("library info size < 0", NULL);
-    return (size);
+    parseHeader(env, addr);
+    parseLoadCommands(env, addr);
+    sortSymbolList(env);
+    displaySymbols(env);
 }
 
-uint32_t getNameSize(char *name)
+void clearSection(t_env *env)
 {
-    int16_t factor = 0;
+    t_section *prev, *tmp;
 
-    factor = strlen(name) / 8;
-    if ((strlen(name) % 8) != 0)
-        factor += 1;
-    printf("name = %s\n", name);
-    printf("(factor * 8) + 4 = %d\n", (factor * 8) + 4);
-    return ((factor * 8) + 4);
-}
-
-void addLibObjList(t_env *env, t_lib_obj *new_obj)
-{
-    t_lib_obj *tmp;
-
-    if (!(tmp = env->lib_objs))
-        env->lib_objs = new_obj;
-    else {
-        while (tmp->next)
-            tmp = tmp->next;
-        tmp->next = new_obj;
+    tmp = env->section_list;
+    while (tmp) {
+        prev = tmp;
+        tmp = tmp->next;
+        free(prev);
     }
+    env->section_list = NULL;
 }
 
-int8_t verifyOverflow(const t_env *env, uint64_t offset) {
-    return (offset < env->file_size);
-}
-
-int verifyLibrary(t_env *env, void *file)
+void setNextFile(t_env *env)
 {
-    char*       signature;
-    uint32_t    offset = 8;
-    struct ar_hdr    *lib_header;
-    struct ar_hdr    *obj_header;
-    t_lib_obj        *new_obj;
-
-    signature = file;
-    if (strncmp(signature, ARMAG, 8) == 0) {
-
-        lib_header = (struct ar_hdr *)&file[offset];
-        offset += (sizeof(struct ar_hdr) + getObjSize(lib_header));
-        while (verifyOverflow(env, offset)) {
-            obj_header = (struct ar_hdr *)&file[offset];
-            offset += sizeof(struct ar_hdr); // ADD verify overflow ????????
-            if (!(new_obj = (t_lib_obj *)malloc(sizeof(t_lib_obj))))
-                errorExit("Library object memory allocation", NULL);
-            bzero(new_obj, sizeof(t_lib_obj));
-            new_obj->addr = &file[offset + getNameSize(&file[offset])];
-            new_obj->next = NULL;
-            addLibObjList(env, new_obj);
-            offset += getObjSize(obj_header);
-        }
-        return (TRUE);
-    }
-    return (FALSE);
+    clearSection(env);
+    bzero(&env->file, sizeof(env->file));
+    bzero(&env->data, sizeof(env->data));
+    env->arch = 0;
+    env->s_bytes = 0;
 }
+
+void processLib(t_env *env, void *file)
+{
+    t_lib_obj *obj;
+    
+    getLibObjList(env, file);
+    obj = env->lib_objs;
+    while (obj) {
+        processSymbol(env, obj->addr);
+        setNextObj(env);
+        obj = obj->next;
+    }
+    clearLib(env);
+}
+
 
 int main(int argc, char **argv)
 {
@@ -126,34 +101,24 @@ int main(int argc, char **argv)
 
     parse_args(argc, argv, &env);
 
-    file = getMap(&env, env.target[0]);
-
-    if (verifyLibrary(&env, file))
-    {
-        printf("IS A LIB\n");
-        t_lib_obj *tmp;
-
-        tmp = env.lib_objs;
-        while (tmp) {
-            parseHeader(&env, tmp->addr);
-            display_header(&env);
-
-            parseLoadCommands(&env, tmp->addr);
-
-            sortSymbolList(&env);
-            displaySymbols(&env);
-            tmp = tmp->next;
+    for (int nb_files = 0; nb_files < argc - 1; nb_files++) {
+        file = getMap(&env, env.target[nb_files]);
+        if (isFatBinary(&env, file)) {
+            for (uint32_t count = 0; count < env.fathdr.n_arch; count++) {
+                (env.fathdr.arch == ARCH_32) ? getSubFile32(&env, file, count) : getSubFile64(&env, file, count);
+                if (isLibrary(env.fathdr.subfile))
+                    processLib(&env, env.fathdr.subfile);
+                else
+                    processSymbol(&env, env.fathdr.subfile);
+            }
         }
+        else {
+            if (isLibrary(file))
+                processLib(&env, file);
+            else
+                processSymbol(&env, file);
+        }
+        setNextFile(&env);
     }
-    else {
-        parseHeader(&env, file);
-        display_header(&env);
-
-        parseLoadCommands(&env, file);
-
-        sortSymbolList(&env);
-        displaySymbols(&env);
-    }
-
-    return (0);    
+    return (0);
 }

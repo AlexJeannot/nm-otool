@@ -3,40 +3,13 @@
 void parseHeader(t_env *env, void *file)
 {
     env->header = (struct mach_header_64 *)file;
-    if (env->header->magic == MH_MAGIC || env->header->magic == MH_CIGAM) {
+    if (env->header->magic == MH_MAGIC || env->header->magic == MH_CIGAM)
         env->arch = ARCH_32;
-    }
-    else if (env->header->magic == MH_MAGIC_64 || env->header->magic == MH_CIGAM_64) {
+    else if (env->header->magic == MH_MAGIC_64 || env->header->magic == MH_CIGAM_64)
         env->arch = ARCH_64;
-    }
 
-    if (env->header->magic == MH_CIGAM || env->header->magic == MH_CIGAM_64) {
-        env->r_bits = R_BITS;
-    }
-
-    uint64_t *test = file;
-    if (*test == MH_LIB)
-        printf("LIBBBBBBBB\n");
-    printf("MH_LIB = %llu\n", (uint64_t)MH_LIB);
-    printf("*test = %llu\n", *test);
-    printf("sizeof header lib = %lu\n", sizeof(t_libhdr));
-    int offset = 8;
-
-    t_libhdr *libheader = (t_libhdr *)&file[offset];
-    printf("size = %s\n", libheader->size);
-    char size_str[9];
-    bzero(&size_str, 9);
-    strncpy(&size_str[0], &libheader->size[0], 8);
-    int32_t size = atoi(libheader->size);
-    printf("size_str = %s\n", size_str);
-    printf("size int = %d\n", size);
-
-    char *testoffset = &file[sizeof(t_libhdr) + size + offset + sizeof(t_libhdr)];
-    printf("testoffset = %s\n", testoffset);
-    printf("strlen(testoffset) = %lu\n", strlen(testoffset));
-    offset += (sizeof(t_libhdr) + size + sizeof(t_libhdr) + 20);
-    struct mach_header_64 *lib_mach = (struct mach_header_64 *)&file[offset];
-    printf("lib_mach->magic = 0x%x\n", lib_mach->magic);
+    if (env->header->magic == MH_CIGAM || env->header->magic == MH_CIGAM_64)
+        env->s_bytes = TRUE;
 
     if (env->arch == 0)
         errorExit("Invalid magic number\n", NULL);
@@ -78,20 +51,20 @@ void parseSegment32(void* l_cmd, t_env *env)
 
     offset = sizeof(struct segment_command);
     segment = (struct segment_command *)l_cmd;
-    printf("parseSegment32 pre for\n");
-    printf("segment->nsects = %d\n", segment->nsects);
+    // printf("parseSegment32 pre for\n");
+    // printf("segment->nsects = %d\n", segment->nsects);
     for (int count = 0; count < segment->nsects; count++) {
-        printf("parseSegment32 for %d\n", count);
+        // printf("parseSegment32 for %d\n", count);
         section = (struct section *)&(l_cmd[offset]);
         if (isNm(env)) {
             if (!(new_section = (t_section *)malloc(sizeof(t_section))))
                 errorExit("Section memory allocation", NULL);
             bzero(new_section, sizeof(t_section));
             new_section->id = nb_sect++;
-            printf("AVANT STRNCPY\n");
+            // printf("AVANT STRNCPY\n");
             strncpy(new_section->segname, section->segname, 15);
             strncpy(new_section->sectname, section->sectname, 15);
-            printf("APRES STRNCPY\n");
+            // printf("APRES STRNCPY\n");
             new_section->next = NULL;
             addSectionList(env, new_section);
         }
@@ -225,9 +198,11 @@ void parseLoadCommands(t_env *env, void *file)
     int offset = 0;
 
     offset += (env->arch == ARCH_32) ? sizeof(struct mach_header) : sizeof(struct mach_header_64);
-    printf("parseLoadCommands pre for\n");
+    // printf("parseLoadCommands pre for\n");
     for (int count = 0; count < env->header->ncmds; count++) {
-        printf("parseLoadCommands for %d\n", count);
+        // printf("(count %% 1000) = %d\n", count % 10000000);
+        // if ((count % 10000000) == 0)
+            // printf("parseLoadCommands for %d\n", count);
         l_cmd = (struct load_command *)&(file[offset]);
         switch (l_cmd->cmd) {
             case (LC_SEGMENT):      parseSegment32(l_cmd, env);   break;

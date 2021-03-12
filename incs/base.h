@@ -16,7 +16,6 @@
 
 # define ARCH_32 32
 # define ARCH_64 64
-# define R_BITS 1
 # define NM 1
 # define OTOOL 2
 # define TRUE 1
@@ -39,7 +38,6 @@ typedef struct s_symbol
     uint64_t        addr;
     char         type;
     char *          name;
-    int8_t       displayed;
     struct s_symbol *next;
 } t_symbol;
 
@@ -49,25 +47,29 @@ typedef struct s_lib_obj
     struct s_lib_obj *next;
 } t_lib_obj;
 
-typedef struct s_libhdr
+typedef struct s_fathdr_info
 {
-    char name[16];
-    char ts[12];
-    char user_id[6];
-    char group_id[6];
-    char mode[8];
-    char size[8];
-    char end[4];
-} t_libhdr;
+    uint32_t    n_arch;
+    int8_t arch;
+    int8_t s_bytes;
+    void *subfile;
+} t_fathdr_info;
+
+typedef struct s_file
+{
+    char *name;
+    uint64_t size;
+    uint64_t subsize;
+} t_file;
 
 typedef struct s_env {
 
     struct mach_header_64 *header;
     char **target;
     int8_t arch;
-    int8_t r_bits;
+    int8_t s_bytes;
     int8_t prog;
-
+    t_fathdr_info fathdr;
     union {
         union {
             struct section *text_32;
@@ -75,13 +77,13 @@ typedef struct s_env {
         } section;
         struct {
             struct symtab_command *table;
+            char *obj_name;
             t_symbol *list;
         } symbol;
     } data;
     t_section *section_list;
     t_lib_obj *lib_objs;
-    uint64_t file_size;
-
+    t_file file;
 } t_env;
 
 void parseHeader(t_env *env, void *file);
@@ -95,5 +97,26 @@ void    sortSymbolList(t_env * env);
 int8_t isNm(const t_env *env);
 int8_t isOtool(const t_env *env);
 int8_t  isTypeDef(char c);
+int8_t controlOverflow(uint64_t size, uint64_t offset);
 
+//Swap
+uint16_t ifSwapuInt16(int8_t swap, uint16_t val);
+int16_t ifSwapInt16(int8_t swap, int16_t val);
+uint32_t ifSwapuInt32(int8_t swap, uint32_t val);
+int32_t ifSwapInt32(int8_t swap, int32_t val);
+uint64_t ifSwapuInt64(int8_t swap, uint64_t val);
+int64_t ifSwapInt64(int8_t swap, int64_t val);
+
+
+uint32_t isFatBinary(t_env *env, void *file);
+void setNextFatSubfile(t_env *env);
+void getSubFile32(t_env *env, void *file, uint32_t arch_pos);
+void getSubFile64(t_env *env, void *file, uint32_t arch_pos);
+
+int8_t isLibrary(void *file);
+void getLibObjList(t_env *env, void *file);
+// int32_t getObjSize(struct ar_hdr *header);
+
+void clearLib(t_env *env);
+void setNextObj(t_env *env);
 #endif

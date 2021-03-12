@@ -24,7 +24,10 @@ SRCS = display.c parse.c nm.c otool.c
 NM_SRCS = nm.c
 BASE_SRCS = display.c \
 			parse.c		\
-			control.c
+			control.c	\
+			swap.c		\
+			fat.c		\
+			lib.c
 			
 # EXEC_SRCS = macos_exec.c
 
