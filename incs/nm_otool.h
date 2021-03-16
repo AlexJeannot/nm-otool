@@ -26,72 +26,71 @@
 
 typedef struct s_target
 {
-    char **name;
-    uint32_t id;
+    char        **name;
+    uint32_t    id;
 } t_target;
 
 typedef struct s_file
 {
-    char *name;
-    uint64_t size;
-    uint64_t subsize;
+    char        *name;
+    uint64_t    size;
+    uint64_t    subsize;
 } t_file;
 
 typedef struct s_fathdr_info
 {
+    void        *subfile;
     uint32_t    n_arch;
-    int8_t arch;
-    int8_t s_bytes;
-    void *subfile;
+    int8_t      arch;
+    int8_t      s_bytes;
 } t_fathdr_info;
 
 typedef struct s_lib_obj
 {
-    void *addr;
-    char *name;
-    struct s_lib_obj *next;
+    void                *addr;
+    char                *name;
+    struct s_lib_obj    *next;
 } t_lib_obj;
 
 typedef struct s_section
 {
-    char        sectname[16];
-    char        segname[16];
-    uint16_t    id;
-    struct s_section *next;
+    char                sectname[16];
+    char                segname[16];
+    struct s_section    *next;
+    uint16_t            id;
 } t_section;
 
 typedef struct s_symbol
 {
-    uint64_t        addr;
-    char         type;
-    char *          name;
-    struct s_symbol *next;
+    uint64_t            addr;
+    char                *name;
+    struct s_symbol     *next;
+    char                type;
 } t_symbol;
 
 typedef struct s_env {
+    int8_t                  prog;
+    
+    struct mach_header_64   *header;
+    int8_t                  arch;
+    int8_t                  s_bytes;
+    uint16_t                nb_sect;
 
-    struct mach_header_64 *header;
-    t_target target;
-    uint32_t target_id;
-    int8_t arch;
-    int8_t s_bytes;
-    int8_t prog;
-    t_fathdr_info fathdr;
+    t_target                target;
+    t_file                  file;
+    t_fathdr_info           fathdr;
+    t_lib_obj               *lib_objs;
+    t_section               *section_list;
     union {
         union {
-            struct section *text_32;
-            struct section_64 *text_64;
+            struct section          *text_32;
+            struct section_64       *text_64;
         } section;
         struct {
-            struct symtab_command *table;
-            char *obj_name;
-            t_symbol *list;
+            struct symtab_command   *table;
+            t_symbol                *list;
         } symbol;
     } data;
-    t_section *section_list;
-    uint16_t nb_sect;
-    t_lib_obj *lib_objs;
-    t_file file;
 } t_env;
 
 /*
