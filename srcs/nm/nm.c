@@ -3,9 +3,9 @@
 void init(t_env *env)
 {
     bzero(env, sizeof(t_env));
-    env->nb_sect = 1;
+    env->info.nsect = 1;
     env->file.fd = -1;
-    env->prog = NM;
+    env->info.prog = NM;
 }
 
 void parseArgs(int argc, char **argv, t_env *env)
@@ -15,7 +15,7 @@ void parseArgs(int argc, char **argv, t_env *env)
     pos = 0;
     nargs = (argc == 1) ? argc : (argc - 1);
     if (!(env->target.name = (char **)malloc(sizeof(char *) * nargs)))
-        errorExit(env, "Target memory allocation\n", NULL);
+        errorExit(env, "Target memory allocation\n");
     bzero(&env->target.name[0], sizeof(char *) * nargs);
 
     if (argc == 1) {
@@ -28,7 +28,7 @@ void parseArgs(int argc, char **argv, t_env *env)
             pos++;
         }
         else if (argv[count] && argv[count][0] == '-')
-            errorExit(env, "This program does not accept options", NULL);
+            errorExit(env, "This program does not accept options");
     }
 }
 

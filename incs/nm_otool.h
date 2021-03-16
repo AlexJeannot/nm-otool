@@ -24,6 +24,14 @@
 # define TRUE 1
 # define FALSE 0
 
+typedef struct  s_info
+{
+    int8_t      prog;
+    int8_t      arch;
+    int8_t      s_bytes;
+    uint16_t    nsect;
+}               t_info;
+
 typedef struct  s_target
 {
     char        **name;
@@ -62,37 +70,41 @@ typedef struct  s_section
     uint16_t            id;
 }               t_section;
 
+typedef struct  s_symbol_list
+{
+    uint64_t                addr;
+    char                    *name;
+    struct s_symbol_list    *next;
+    char                    type;
+}               t_symbol_list;
+
 typedef struct  s_symbol
 {
-    uint64_t            addr;
-    char                *name;
-    struct s_symbol     *next;
-    char                type;
+    struct symtab_command   *table;
+    t_symbol_list           *list;
 }               t_symbol;
+
+typedef struct  s_text
+{
+    uint64_t    addr;
+    uint64_t    size;
+    uint32_t    offset;
+}               t_text;
 
 typedef struct  s_env
 {
-    int8_t                  prog;
-    
     struct mach_header_64   *header;
-    int8_t                  arch;
-    int8_t                  s_bytes;
-    uint16_t                nb_sect;
 
+    t_info                  info;
     t_target                target;
     t_file                  file;
     t_fathdr_info           fathdr;
     t_lib_obj               *lib_objs;
     t_section               *section_list;
+
     union {
-        union {
-            struct section          *text_32;
-            struct section_64       *text_64;
-        } section;
-        struct {
-            struct symtab_command   *table;
-            t_symbol                *list;
-        } symbol;
+        t_text              text;
+        t_symbol            symbol;
     } data;
 }               t_env;
 
@@ -102,28 +114,32 @@ typedef struct  s_env
 void        clearLib(t_env *env);
 void        clearSection(t_env *env);
 void        clearSymbol(t_env *env);
+void        clearTextSect(t_env *env);
 void        clearFile(t_env *env);
 void        clearAll(t_env *env);
-void        deleteSymbol(t_env *env, t_symbol *symbol);
+void        deleteSymbol(t_env *env, t_symbol_list *symbol);
 
 /*
 ** CONTROL.C
 */
 int8_t      isNm(const t_env *env);
 int8_t      isOtool(const t_env *env);
+int8_t      isArch32(const t_env *env);
 int8_t      isTypeDef(char c);
+int8_t      isTextSection(const char *section);
 int8_t      controlOverflow(uint64_t size, uint64_t offset);
 
 /*
 ** DISPLAY.C
 */
+void        displayHexText(t_env *env, void *file, char *obj_name);
 void        displaySymbols(const t_env *env, char *obj_name);
 void        sortSymbolList(t_env *env);
 
 /*
 ** EXIT.C
 */
-void        errorExit(t_env *env, char *error, char *exec);
+void        errorExit(t_env *env, char *error);
 
 /*
 ** FAT.C
@@ -173,10 +189,15 @@ int64_t     ifSwapInt64(int8_t swap, int64_t val);
 /*
 ** SYMBOL.C
 */
-void        addSymbolList(t_env *env, t_symbol *new_symbol);
+void        addSymbolList(t_env *env, t_symbol_list *new_symbol);
 void        getSymbols32(t_env *env, void *file, struct symtab_command *sym_cmd);
 void        getSymbols64(t_env *env, void *file, struct symtab_command *sym_cmd);
 void        parseSymtab(t_env *env, void *file, struct load_command *l_cmd);
 void        processSymbol(t_env *env, void *addr, char *obj_name);
+
+/*
+** TEXT.C
+*/
+void processText(t_env *env, void *addr, char *obj_name);
 
 #endif

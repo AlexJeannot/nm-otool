@@ -1,11 +1,11 @@
 #include "../../incs/nm_otool.h"
 
-void errorExit(t_env *env, char *error, char *exec)
+void errorExit(t_env *env, char *error)
 {
-    (env->prog == NM) ? printf("ft_nm") : printf("ft_otool");
+    (isNm(env)) ? printf("ft_nm") : printf("ft_otool");
     printf(": error: ");
-    if (exec)
-        printf("%s: ", exec);
+    if (env->file.name)
+        printf("%s: ", env->file.name);
     printf("%s\n", error);
     clearAll(env);
     exit(1);

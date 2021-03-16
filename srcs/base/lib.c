@@ -12,11 +12,11 @@ int8_t isLibrary(void *file)
 
 void setNextObj(t_env *env)
 {
-    t_symbol *prev, *tmp;
+    t_symbol_list *prev, *tmp;
 
-    env->arch = 0;
-    env->nb_sect = 1;
-    clearSymbol(env);
+    env->info.arch = 0;
+    env->info.nsect = 1;
+    (isNm(env)) ? clearSymbol(env) : clearTextSect(env);
     clearSection(env);
 }
 
@@ -28,7 +28,7 @@ int32_t getObjSize(t_env *env, struct ar_hdr *header)
     bzero(&hdr_size, 11);
     strncpy(&hdr_size[0], &header->ar_size[0], 10);
     if ((size = atoi(hdr_size)) < 0)
-        errorExit(env, "library info size < 0", env->target.name[env->target.id]);
+        errorExit(env, "library info size < 0");
     return (size);
 }
 
@@ -74,7 +74,7 @@ void getLibObjList(t_env *env, void *file, int8_t file_type)
             break ;
 
         if (!(new_obj = (t_lib_obj *)malloc(sizeof(t_lib_obj))))
-            errorExit(env, "Library object memory allocation", env->target.name[env->target.id]);
+            errorExit(env, "Library object memory allocation");
         bzero(new_obj, sizeof(t_lib_obj));
         new_obj->addr = &file[offset + getNameSize(&file[offset])];
         new_obj->name = &file[offset];
@@ -92,7 +92,7 @@ void processLib(t_env *env, void *file, int8_t file_type)
     getLibObjList(env, file, file_type);
     obj = env->lib_objs;
     while (obj) {
-        processSymbol(env, obj->addr, obj->name);
+        (isNm(env)) ? processSymbol(env, obj->addr, obj->name) : processText(env, obj->addr, obj->name);
         setNextObj(env);
         obj = obj->next;
     }

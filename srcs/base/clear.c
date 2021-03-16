@@ -28,7 +28,7 @@ void clearSection(t_env *env)
 
 void clearSymbol(t_env *env)
 {
-    t_symbol *prev, *tmp;
+    t_symbol_list *prev, *tmp;
 
     tmp = env->data.symbol.list;
     while (tmp) {
@@ -37,6 +37,11 @@ void clearSymbol(t_env *env)
         free(prev);
     }
     env->data.symbol.list = NULL;
+}
+
+void clearTextSect(t_env *env)
+{
+    bzero(&env->data.text, sizeof(t_text));
 }
 
 void clearFile(t_env *env)
@@ -52,15 +57,15 @@ void clearAll(t_env *env)
 {
     clearLib(env);
     clearSection(env);
-    clearSymbol(env);
+    (isNm(env)) ? clearSymbol(env) : clearTextSect(env);
     clearFile(env);
     if (env->target.name)
         free(env->target.name);
 }
 
-void deleteSymbol(t_env *env, t_symbol *symbol)
+void deleteSymbol(t_env *env, t_symbol_list *symbol)
 {
-    t_symbol *prev, *tmp;
+    t_symbol_list *prev, *tmp;
 
     tmp = env->data.symbol.list;
     if (tmp == symbol) {
