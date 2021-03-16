@@ -4,12 +4,13 @@ void init(t_env *env)
 {
     bzero(env, sizeof(t_env));
     env->nb_sect = 1;
+    env->file.fd = -1;
     env->prog = NM;
 }
 
 void parseArgs(int argc, char **argv, t_env *env)
 {
-    uint16_t nargs, pos;
+    uint16_t    nargs, pos;
 
     pos = 0;
     nargs = (argc == 1) ? argc : (argc - 1);
@@ -33,8 +34,8 @@ void parseArgs(int argc, char **argv, t_env *env)
 
 int main(int argc, char **argv)
 {
-    void *file;
-    t_env env;
+    void    *file;
+    t_env   env;
 
     init(&env);
     parseArgs(argc, argv, &env);

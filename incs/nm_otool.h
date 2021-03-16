@@ -32,10 +32,12 @@ typedef struct  s_target
 
 typedef struct s_file
 {
+    void        *addr;
     char        *name;
     uint64_t    size;
     uint64_t    subsize;
-} t_file;
+    int32_t     fd;
+}               t_file;
 
 typedef struct  s_fathdr_info
 {
@@ -100,6 +102,7 @@ typedef struct  s_env
 void        clearLib(t_env *env);
 void        clearSection(t_env *env);
 void        clearSymbol(t_env *env);
+void        clearFile(t_env *env);
 void        clearAll(t_env *env);
 void        deleteSymbol(t_env *env, t_symbol *symbol);
 

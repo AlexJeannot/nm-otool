@@ -12,7 +12,7 @@ void parseHeader(t_env *env, void *file)
         env->s_bytes = TRUE;
 
     if (env->arch == 0)
-        errorExit(env, "Invalid magic number\n", env->target.name[env->target.id]);
+        errorExit(env, "The file was not recognized as a valid object file\n", env->target.name[env->target.id]);
 }
 
 void parseLoadCommands(t_env *env, void *file)

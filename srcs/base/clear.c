@@ -39,11 +39,21 @@ void clearSymbol(t_env *env)
     env->data.symbol.list = NULL;
 }
 
+void clearFile(t_env *env)
+{
+    munmap(env->file.addr, env->file.size);
+    if (env->file.fd >= 0)
+        close(env->file.fd);
+    bzero(&env->file, sizeof(t_file));
+    env->file.fd = -1;
+}
+
 void clearAll(t_env *env)
 {
     clearLib(env);
     clearSection(env);
     clearSymbol(env);
+    clearFile(env);
     if (env->target.name)
         free(env->target.name);
 }
