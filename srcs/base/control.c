@@ -1,4 +1,4 @@
-#include "../../incs/base.h"
+#include "../../incs/nm_otool.h"
 
 int8_t isNm(const t_env *env) {
     return (env->prog == NM);

@@ -22,12 +22,17 @@ BASE_DOBJS	= ./comp/base/
 # SOURCES
 SRCS = display.c parse.c nm.c otool.c
 NM_SRCS = nm.c
-BASE_SRCS = display.c \
-			parse.c		\
+BASE_SRCS = clear.c		\
 			control.c	\
-			swap.c		\
+			display.c	\
+			exit.c 		\
 			fat.c		\
-			lib.c
+			lib.c		\
+			parse.c		\
+			resources.c	\
+			segment.c	\
+			swap.c		\
+			symbol.c
 			
 # EXEC_SRCS = macos_exec.c
 
@@ -35,9 +40,7 @@ NM_OBJS = $(NM_SRCS:%.c=$(NM_DOBJS)%.o)
 BASE_OBJS = $(BASE_SRCS:%.c=$(BASE_DOBJS)%.o)     
 
 
-HEADERS = ./incs/nm.h \
-			./incs/otool.h \
-			./incs/base.h
+HEADERS =	./incs/nm_otool.h
 
 
 all: $(NAME) #exec
