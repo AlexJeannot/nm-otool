@@ -1,5 +1,10 @@
 #include "../../incs/nm_otool.h"
 
+/*
+** Parse file/subfile header
+** Set variable depending on architecture
+** Set variable depending on endianness
+*/
 void parseHeader(t_env *env, void *file)
 {
     env->header = (struct mach_header_64 *)file;
@@ -15,6 +20,16 @@ void parseHeader(t_env *env, void *file)
         errorExit(env, "The file was not recognized as a valid object file\n");
 }
 
+/*
+** Parse load commands
+** Increment offset by the size of mach-o header depending on architecture
+** While load commands
+** -- Control overflow
+** -- If 32 bits segment then parse it
+** -- If 64 bits segment then parse it
+** -- If symbol table then parse it
+** -- Increment offset by load command size
+*/
 void parseLoadCommands(t_env *env, void *file)
 {
     struct load_command *l_cmd;

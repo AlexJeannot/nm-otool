@@ -1,5 +1,8 @@
 #include "../../incs/nm_otool.h"
 
+/*
+** Add symbol linked list elem
+*/
 void addSymbolList(t_env *env, t_symbol_list *new_symbol)
 {
     t_symbol_list *tmp;
@@ -13,6 +16,11 @@ void addSymbolList(t_env *env, t_symbol_list *new_symbol)
     }
 }
 
+/*
+** Get symbol type depending on bit masks
+** For mask N_SECT, use section index
+** If exterior symbol then capital letter
+*/
 char getSymbolType(t_env *env, t_symbol_list *symbol, uint8_t s_type, uint8_t section, uint64_t value)
 {
     t_section   *tmp;
@@ -48,10 +56,23 @@ char getSymbolType(t_env *env, t_symbol_list *symbol, uint8_t s_type, uint8_t se
     return (type);
 }
 
+/*
+** Create symbol linked list element for 32 bits architecture
+** nsyms is the number of symbols
+** offset is the symbol table offset
+** stroff is the string table offset
+** While symbols
+** -- Control overflow
+** -- Allocate memory for element
+** -- Get symbol address
+** -- Get symbol type
+** -- Get symbol name using n_strx value which is the name offset in the string table
+** -- Increment offset by a nlist header size
+*/
 void getSymbols32(t_env *env, void *file, struct symtab_command *sym_cmd)
 {
     struct nlist    *symbol;
-    t_symbol_list        *new_symbol;
+    t_symbol_list   *new_symbol;
     uint64_t        offset;
     uint32_t        nsyms, stroff, n_strx;
 
@@ -80,6 +101,19 @@ void getSymbols32(t_env *env, void *file, struct symtab_command *sym_cmd)
     }
 }
 
+/*
+** Create symbol linked list element for 64 bits architecture
+** nsyms is the number of symbols
+** offset is the symbol table offset
+** stroff is the string table offset
+** While symbols
+** -- Control overflow
+** -- Allocate memory for element
+** -- Get symbol address
+** -- Get symbol type
+** -- Get symbol name using n_strx value which is the name offset in the string table
+** -- Increment offset by a nlist_64 header size
+*/
 void getSymbols64(t_env *env, void *file, struct symtab_command *sym_cmd)
 {
     struct nlist_64 *symbol;
@@ -112,6 +146,10 @@ void getSymbols64(t_env *env, void *file, struct symtab_command *sym_cmd)
     }
 }
 
+/*
+** Introduction function to symbol table parsing
+** if otool we do not need symbols
+*/
 void parseSymtab(t_env *env, void *file, struct load_command *l_cmd)
 {
     struct symtab_command *sym_cmd;
@@ -121,6 +159,9 @@ void parseSymtab(t_env *env, void *file, struct load_command *l_cmd)
     (isArch32(env)) ? getSymbols32(env, file, sym_cmd) : getSymbols64(env, file, sym_cmd);
 }
 
+/*
+** Process symbol
+*/
 void processSymbol(t_env *env, void *addr, char *obj_name)
 {
     parseHeader(env, addr);

@@ -1,5 +1,8 @@
 #include "../../incs/nm_otool.h"
 
+/*
+** Add element in section linked list
+*/
 void addSectionList(t_env *env, t_section *new_section)
 {
     t_section *tmp;
@@ -13,6 +16,22 @@ void addSectionList(t_env *env, t_section *new_section)
     }
 }
 
+/*
+** Parse segment for 32 bits architecture
+** Increment offset by size of segment header
+** While section
+** -- If nm
+** --- Control overflow
+** --- Allocate memory for section linked list element
+** --- Set section id and increment it
+** --- Set segment name
+** --- Set section name
+** -- If otool
+** --- Set __TEXT, __text section address
+** --- Set __TEXT, __text section size
+** --- Set __TEXT, __text section offset
+** -- Increment offset by size of section header
+*/
 void parseSegment32(t_env *env, void *l_cmd, uint64_t g_offset)
 {
     struct segment_command  *segment;
@@ -50,6 +69,22 @@ void parseSegment32(t_env *env, void *l_cmd, uint64_t g_offset)
     }
 }
 
+/*
+** Parse segment for 32 bits architecture
+** Increment offset by size of segment header
+** While section
+** -- If nm
+** --- Control overflow
+** --- Allocate memory for section linked list element
+** --- Set section id and increment it
+** --- Set segment name
+** --- Set section name
+** -- If otool
+** --- Set __TEXT, __text section address
+** --- Set __TEXT, __text section size
+** --- Set __TEXT, __text section offset
+** -- Increment offset by size of section header
+*/
 void parseSegment64(t_env *env, void* l_cmd, uint64_t g_offset)
 {
     struct segment_command_64   *segment;

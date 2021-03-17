@@ -43,13 +43,13 @@ typedef struct s_file
     void        *addr;
     char        *name;
     uint64_t    size;
-    uint64_t    subsize;
     int32_t     fd;
 }               t_file;
 
 typedef struct  s_fathdr_info
 {
     void        *subfile;
+    uint64_t    subsize;
     uint32_t    n_arch;
     int8_t      arch;
     int8_t      s_bytes;

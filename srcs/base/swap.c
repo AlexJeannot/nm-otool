@@ -1,5 +1,13 @@
 #include "../../incs/nm_otool.h"
 
+/*
+** For signed integer
+** & on right shift because MSB of 1 set 1 on every bit
+*/
+
+/*
+** Swap endianness function for unsigned 16 bits integer
+*/
 uint16_t ifSwapuInt16(int8_t swap, uint16_t val)
 {
     if (swap)
@@ -7,6 +15,9 @@ uint16_t ifSwapuInt16(int8_t swap, uint16_t val)
     return (val);
 }
 
+/*
+** Swap endianness function for signed 16 bits integer
+*/
 int16_t ifSwapInt16(int8_t swap, int16_t val)
 {
     if (swap)
@@ -14,6 +25,9 @@ int16_t ifSwapInt16(int8_t swap, int16_t val)
     return (val);
 }
 
+/*
+** Swap endianness function for unsigned 32 bits integer
+*/
 uint32_t ifSwapuInt32(int8_t swap, uint32_t val)
 {
     if (swap) {
@@ -23,6 +37,9 @@ uint32_t ifSwapuInt32(int8_t swap, uint32_t val)
     return (val);
 }
 
+/*
+** Swap endianness function for signed 32 bits integer
+*/
 int32_t ifSwapInt32(int8_t swap, int32_t val)
 {
     if (swap) {
@@ -32,6 +49,9 @@ int32_t ifSwapInt32(int8_t swap, int32_t val)
     return (val);
 }
 
+/*
+** Swap endianness function for unsigned 64 bits integer
+*/
 uint64_t ifSwapuInt64(int8_t swap, uint64_t val)
 {
     if (swap) {
@@ -42,6 +62,9 @@ uint64_t ifSwapuInt64(int8_t swap, uint64_t val)
     return (val);
 }
 
+/*
+** Swap endianness function for signed 64 bits integer
+*/
 int64_t ifSwapInt64(int8_t swap, int64_t val)
 {
     if (swap) {

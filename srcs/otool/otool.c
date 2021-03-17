@@ -1,5 +1,8 @@
 #include "../../incs/nm_otool.h"
 
+/*
+** Init variables
+*/
 void init(t_env *env)
 {
     bzero(env, sizeof(t_env));
@@ -8,6 +11,11 @@ void init(t_env *env)
     env->info.prog = OTOOL;
 }
 
+/*
+** Parse arguments
+** Allocate an array of char pointer
+** if no args then a.out is use by default
+*/
 void parseArgs(int argc, char **argv, t_env *env)
 {
     uint16_t    nargs, pos;
@@ -32,6 +40,20 @@ void parseArgs(int argc, char **argv, t_env *env)
     }
 }
 
+/*
+** Main function for otool program
+** Init variables
+** Parse arguments
+** For every file given in argument
+** -- Open and get map of file
+** -- If FAT binary
+** --- For every subfile
+** ---- Process library or executable
+** -- If usual binary
+** --- Process library or executable
+** -- Set variables for next file
+** Clear all resources
+*/
 int main(int argc, char **argv)
 {
     void    *file;

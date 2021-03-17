@@ -1,5 +1,8 @@
 #include "../../incs/nm_otool.h"
 
+/*
+** Display address in hexadecimal format
+*/
 void displayAddr(const t_env *env, uint64_t addr)
 {
     if (isArch32(env))
@@ -8,6 +11,9 @@ void displayAddr(const t_env *env, uint64_t addr)
         printf("%016llx", addr);
 }
 
+/*
+** Display __TEXT, __text section in hexadecimal format
+*/
 void displayHexText(t_env *env, void *file, char *obj_name)
 {
     uint64_t    offset;
@@ -31,12 +37,16 @@ void displayHexText(t_env *env, void *file, char *obj_name)
     printf("\n");
 }
 
+/*
+** Display symbols
+** Format: Address Type Name
+*/
 void displaySymbols(const t_env *env, char *obj_name)
 {
     t_symbol_list *tmp;
 
     tmp = env->data.symbol.list;
-    printf("\n%s", env->target.name[env->target.id]);
+    printf("\n%s", env->file.name);
     (obj_name) ? printf("(%s):\n", obj_name) : printf(":\n");
     while (tmp)
     {
@@ -51,7 +61,8 @@ void displaySymbols(const t_env *env, char *obj_name)
 }
 
 /*
-** 
+** Sort symbol linked list name
+** Delete elem if debug type
 ** p_sym == previous symbol elem (n - 1)
 ** f_sym == first symbol elem (n)
 ** s_sym == second symbol elem (n + 1)

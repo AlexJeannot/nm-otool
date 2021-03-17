@@ -1,5 +1,8 @@
 #include "../../incs/nm_otool.h"
 
+/*
+** Verify if file is a library
+*/
 int8_t isLibrary(void *file)
 {
     char    *signature;
@@ -10,6 +13,9 @@ int8_t isLibrary(void *file)
     return (FALSE);
 }
 
+/*
+** Setup variables for next library object processing
+*/
 void setNextObj(t_env *env)
 {
     t_symbol_list *prev, *tmp;
@@ -20,6 +26,10 @@ void setNextObj(t_env *env)
     clearSection(env);
 }
 
+/*
+** Get library object size
+** ASCII in file -> need to atoi() size field
+*/
 int32_t getObjSize(t_env *env, struct ar_hdr *header)
 {
     char        hdr_size[11];
@@ -32,6 +42,11 @@ int32_t getObjSize(t_env *env, struct ar_hdr *header)
     return (size);
 }
 
+/*
+** Get library object name size
+** Need to increment the offset with this size field to find first byte address of library object
+** Get superior multiple of string lenth and add 4
+*/
 uint32_t getNameSize(char *name)
 {
     int16_t factor = 0;
@@ -42,6 +57,9 @@ uint32_t getNameSize(char *name)
     return ((factor * 8) + 4);
 }
 
+/*
+** Add elem to library object linked list
+*/
 void addLibObjList(t_env *env, t_lib_obj *new_obj)
 {
     t_lib_obj *tmp;
@@ -55,6 +73,19 @@ void addLibObjList(t_env *env, t_lib_obj *new_obj)
     }
 }
 
+/*
+** Create library object linked list
+** Offset start at 8 (size of signature)
+** Size if file/subfile size depending if USUAL/FAT binary
+** Offset is incremented by size of library header and size of other information to get to first object header
+** While we do not overflow file/subfile size
+** -- Increment offset by header size (and control overflow)
+** -- Allocate memory for linked list elem
+** -- Set first byte object adress by adding name size
+** -- Set object name
+** -- Add element in linked list
+** -- Increment offset by object size to get to next object header
+*/
 void getLibObjList(t_env *env, void *file, int8_t file_type)
 {
     struct ar_hdr   *lib_header;
@@ -64,13 +95,14 @@ void getLibObjList(t_env *env, void *file, int8_t file_type)
     uint32_t        offset;
 
     offset = 8;
-    size = (file_type == MAIN_FILE) ? env->file.size : env->file.subsize;
+    size = (file_type == MAIN_FILE) ? env->file.size : env->fathdr.subsize;
     lib_header = (struct ar_hdr *)&file[offset];
     offset += (sizeof(struct ar_hdr) + getObjSize(env, lib_header));
 
     while (controlOverflow(size, offset)) {
         obj_header = (struct ar_hdr *)&file[offset];
-        if (!(controlOverflow(size, offset += sizeof(struct ar_hdr))))
+        offset += sizeof(struct ar_hdr);
+        if (!(controlOverflow(size, offset)))
             break ;
 
         if (!(new_obj = (t_lib_obj *)malloc(sizeof(t_lib_obj))))
@@ -85,6 +117,15 @@ void getLibObjList(t_env *env, void *file, int8_t file_type)
     }
 }
 
+/*
+** Process library
+** Create a linked list with all library object informations
+** While object
+** -- If program is nm then process symbol
+** -- If program is otool process __TEXT, __text setion
+** -- Set value for next object
+** Clear library object linked list
+*/
 void processLib(t_env *env, void *file, int8_t file_type)
 {
     t_lib_obj *obj;
