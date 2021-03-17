@@ -14,23 +14,24 @@ void init(t_env *env)
 /*
 ** Parse arguments
 ** Allocate an array of char pointer
-** if no args then a.out is use by default
+** if no args then error exit
 */
-void parseArgs(int argc, char **argv, t_env *env)
+void parseArgs(t_env *env, int argc, char **argv)
 {
-    uint16_t    nargs, pos;
+    uint16_t    pos;
 
     pos = 0;
-    nargs = (argc == 1) ? argc : (argc - 1);
-    if (!(env->target.name = (char **)malloc(sizeof(char *) * nargs)))
+    if (argc == 1)
+        errorExit(env, "at least one file must be specified");
+    if (!(env->target.name = (char **)malloc(sizeof(char *) * (argc - 1))))
         errorExit(env, "Target memory allocation\n");
-    bzero(&env->target.name[0], sizeof(char *) * nargs);
+    bzero(&env->target.name[0], sizeof(char *) * (argc - 1));
 
     if (argc == 1) {
         env->target.name[0] = argv[0];
         return ;
     }
-    for (int count = 1; count < argc; count++) {
+    for (int32_t count = 1; count < argc; count++) {
         if (argv[count] && argv[count][0] != '-') {
             env->target.name[pos] = argv[count];
             pos++;
@@ -60,8 +61,8 @@ int main(int argc, char **argv)
     t_env   env;
 
     init(&env);
-    parseArgs(argc, argv, &env);
-    for (env.target.id = 0; env.target.id < argc - 1; env.target.id++) {
+    parseArgs(&env, argc, argv);
+    for (env.target.id = 0; env.target.id < (uint32_t)(argc - 1); env.target.id++) {
         file = getMap(&env, env.target.name[env.target.id]);
         if (isFatBinary(&env, file)) {
             for (uint32_t count = 0; count < env.fathdr.n_arch; count++) {

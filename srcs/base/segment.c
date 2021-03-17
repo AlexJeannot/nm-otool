@@ -44,7 +44,7 @@ void parseSegment32(t_env *env, void *l_cmd, uint64_t g_offset)
     segment = (struct segment_command *)l_cmd;
     nsects = ifSwapuInt32(env->info.s_bytes, segment->nsects);
 
-    for (int count = 0; count < nsects; count++) {
+    for (uint32_t count = 0; count < nsects; count++) {
         if (!(controlOverflow(env->file.size, g_offset + offset)))
             errorExit(env, "Overflow on 32-bits segment parsing");
         section = (struct section *)&(l_cmd[offset]);
@@ -97,7 +97,7 @@ void parseSegment64(t_env *env, void* l_cmd, uint64_t g_offset)
     segment = (struct segment_command_64 *)l_cmd;
     nsects = ifSwapuInt32(env->info.s_bytes, segment->nsects);
 
-    for (int count = 0; count < nsects; count++) {
+    for (uint32_t count = 0; count < nsects; count++) {
         if (!(controlOverflow(env->file.size, g_offset + offset)))
             errorExit(env, "Overflow on 64-bits segment parsing");
         section = (struct section_64 *)&(l_cmd[offset]);

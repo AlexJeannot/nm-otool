@@ -39,7 +39,7 @@ void parseLoadCommands(t_env *env, void *file)
     ncmds = ifSwapuInt32(env->info.s_bytes, env->header->ncmds);
     offset = (isArch32(env)) ? sizeof(struct mach_header) : sizeof(struct mach_header_64);
 
-    for (int count = 0; count < ncmds; count++) {
+    for (uint32_t count = 0; count < ncmds; count++) {
         if (!(controlOverflow(env->file.size, offset)))
             errorExit(env, "Overflow on load command parsing");
         l_cmd = (struct load_command *)&(file[offset]);

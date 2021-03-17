@@ -16,7 +16,6 @@ void displayAddr(const t_env *env, uint64_t addr)
 */
 void displayHexText(t_env *env, void *file, char *obj_name)
 {
-    uint64_t    offset;
     uint64_t    final_offset;
     char        *hex;
 

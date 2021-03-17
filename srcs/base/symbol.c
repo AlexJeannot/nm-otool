@@ -21,7 +21,7 @@ void addSymbolList(t_env *env, t_symbol_list *new_symbol)
 ** For mask N_SECT, use section index
 ** If exterior symbol then capital letter
 */
-char getSymbolType(t_env *env, t_symbol_list *symbol, uint8_t s_type, uint8_t section, uint64_t value)
+char getSymbolType(t_env *env, uint8_t s_type, uint8_t section, uint64_t value)
 {
     t_section   *tmp;
     char        type;
@@ -80,7 +80,7 @@ void getSymbols32(t_env *env, void *file, struct symtab_command *sym_cmd)
     offset = ifSwapuInt32(env->info.s_bytes, sym_cmd->symoff);
     stroff = ifSwapuInt32(env->info.s_bytes, sym_cmd->stroff);
 
-    for (int count = 0; count < nsyms; count++) {
+    for (uint32_t count = 0; count < nsyms; count++) {
         if (!(controlOverflow(env->file.size, offset)))
             errorExit(env, "Overflow on 32-bits symbol table parsing");
         symbol = (struct nlist *)&(file[offset]);
@@ -89,7 +89,7 @@ void getSymbols32(t_env *env, void *file, struct symtab_command *sym_cmd)
             errorExit(env, "Symbol memory allocation");
         bzero(new_symbol, sizeof(t_symbol_list));
         new_symbol->addr = ifSwapuInt32(env->info.s_bytes, symbol->n_value);
-        new_symbol->type = getSymbolType(env, new_symbol, symbol->n_type, symbol->n_sect, new_symbol->addr);
+        new_symbol->type = getSymbolType(env, symbol->n_type, symbol->n_sect, new_symbol->addr);
         n_strx = ifSwapuInt32(env->info.s_bytes, symbol->n_un.n_strx);
         if (!(controlOverflow(env->file.size, stroff + n_strx)))
             errorExit(env, "Overflow on 32-bits string table parsing");
@@ -125,7 +125,7 @@ void getSymbols64(t_env *env, void *file, struct symtab_command *sym_cmd)
     offset = ifSwapuInt32(env->info.s_bytes, sym_cmd->symoff);
     stroff = ifSwapuInt32(env->info.s_bytes, sym_cmd->stroff);
 
-    for (int count = 0; count < nsyms; count++) {
+    for (uint32_t count = 0; count < nsyms; count++) {
         if (!(controlOverflow(env->file.size, offset)))
             errorExit(env, "Overflow on 64-bits symbol table parsing");
         symbol = (struct nlist_64 *)&(file[offset]);
@@ -134,7 +134,7 @@ void getSymbols64(t_env *env, void *file, struct symtab_command *sym_cmd)
             errorExit(env, "Symbol memory allocation");
         bzero(new_symbol, sizeof(t_symbol_list));
         new_symbol->addr = symbol->n_value;
-        new_symbol->type = getSymbolType(env, new_symbol, symbol->n_type, symbol->n_sect, symbol->n_value);
+        new_symbol->type = getSymbolType(env, symbol->n_type, symbol->n_sect, symbol->n_value);
         n_strx = ifSwapuInt32(env->info.s_bytes, symbol->n_un.n_strx);
         if (!(controlOverflow(env->file.size, stroff + n_strx)))
             errorExit(env, "Overflow on 64-bits string table parsing");

@@ -16,9 +16,9 @@ void init(t_env *env)
 ** Allocate an array of char pointer
 ** if no args then a.out is use by default
 */
-void parseArgs(int argc, char **argv, t_env *env)
+uint16_t parseArgs(t_env *env, int argc, char **argv)
 {
-    uint16_t    nargs, pos;
+    uint32_t    nargs, pos;
 
     pos = 0;
     nargs = (argc == 1) ? argc : (argc - 1);
@@ -27,17 +27,20 @@ void parseArgs(int argc, char **argv, t_env *env)
     bzero(&env->target.name[0], sizeof(char *) * nargs);
 
     if (argc == 1) {
-        env->target.name[0] = argv[0];
-        return ;
+        strncpy(&env->target.def_arg[0], "a.out", 5);
+        env->target.name[0] = &env->target.def_arg[0];
     }
-    for (int count = 1; count < argc; count++) {
-        if (argv[count] && argv[count][0] != '-') {
-            env->target.name[pos] = argv[count];
-            pos++;
-        }
-        else if (argv[count] && argv[count][0] == '-')
-            errorExit(env, "This program does not accept options");
+    else {
+        for (int32_t count = 1; count < argc; count++) {
+            if (argv[count] && argv[count][0] != '-') {
+                env->target.name[pos] = argv[count];
+                pos++;
+            }
+            else if (argv[count] && argv[count][0] == '-')
+                errorExit(env, "This program does not accept options");
+        } 
     }
+    return (nargs);
 }
 
 /*
@@ -56,12 +59,13 @@ void parseArgs(int argc, char **argv, t_env *env)
 */
 int main(int argc, char **argv)
 {
-    void    *file;
-    t_env   env;
+    void        *file;
+    t_env       env;
+    uint32_t    nargs;
 
     init(&env);
-    parseArgs(argc, argv, &env);
-    for (env.target.id = 0; env.target.id < argc - 1; env.target.id++) {
+    nargs = parseArgs(&env, argc, argv);
+    for (env.target.id = 0; env.target.id < nargs; env.target.id++) {
         file = getMap(&env, env.target.name[env.target.id]);
         if (isFatBinary(&env, file)) {
             for (uint32_t count = 0; count < env.fathdr.n_arch; count++) {

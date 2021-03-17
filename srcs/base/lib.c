@@ -18,8 +18,6 @@ int8_t isLibrary(void *file)
 */
 void setNextObj(t_env *env)
 {
-    t_symbol_list *prev, *tmp;
-
     env->info.arch = 0;
     env->info.nsect = 1;
     (isNm(env)) ? clearSymbol(env) : clearTextSect(env);

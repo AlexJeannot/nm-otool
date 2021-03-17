@@ -36,6 +36,7 @@ typedef struct  s_target
 {
     char        **name;
     uint32_t    id;
+    char        def_arg[6];
 }               t_target;
 
 typedef struct s_file

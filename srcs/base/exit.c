@@ -6,7 +6,7 @@
 */
 void errorExit(t_env *env, char *error)
 {
-    (isNm(env)) ? printf("ft_nm") : printf("ft_otool");
+    (isNm(env)) ? fprintf(stderr, "ft_nm") : fprintf(stderr, "ft_otool");
     fprintf(stderr, ": error: ");
     if (env->file.name)
         fprintf(stderr, "%s: ", env->file.name);
