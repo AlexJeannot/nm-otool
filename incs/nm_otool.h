@@ -24,14 +24,20 @@
 # define TRUE 1
 # define FALSE 0
 
+/*
+** Structure of general informations
+*/
 typedef struct  s_info
 {
-    int8_t      prog;
-    int8_t      arch;
-    int8_t      s_bytes;
-    uint16_t    nsect;
+    int8_t      prog;       // nm or otool
+    int8_t      arch;       // 32 or 64 bits
+    int8_t      s_bytes;    // need to swap endianness or not
+    uint16_t    nsect;      // number of section (start at 1 and then incremented)
 }               t_info;
 
+/*
+** Structure of targets (arguments)
+*/
 typedef struct  s_target
 {
     char        **name;
@@ -39,30 +45,42 @@ typedef struct  s_target
     char        def_arg[6];
 }               t_target;
 
+/*
+** Structure of file informations
+*/
 typedef struct s_file
 {
-    void        *addr;
+    void        *addr;  // File first byte address
     char        *name;
     uint64_t    size;
     int32_t     fd;
 }               t_file;
 
+/*
+** Structure of FAT header informations
+*/
 typedef struct  s_fathdr_info
 {
-    void        *subfile;
+    void        *subfile;   // Subfile first byte address
     uint64_t    subsize;
-    uint32_t    n_arch;
-    int8_t      arch;
-    int8_t      s_bytes;
+    uint32_t    n_arch;     // Number of architectures
+    int8_t      arch;       // Type of architecture
+    int8_t      s_bytes;    // need to swap endianness or not
 }               t_fathdr_info;
 
+/*
+** Structure of linked list for library object
+*/
 typedef struct  s_lib_obj
 {
-    void                *addr;
-    char                *name;
+    void                *addr;  // Object first byte address
+    char                *name;  
     struct s_lib_obj    *next;
 }               t_lib_obj;
 
+/*
+** Structure of linked list for section
+*/
 typedef struct  s_section
 {
     char                sectname[16];
@@ -71,6 +89,9 @@ typedef struct  s_section
     uint16_t            id;
 }               t_section;
 
+/*
+** Structure of linked list for symbol
+*/
 typedef struct  s_symbol_list
 {
     uint64_t                addr;
@@ -79,12 +100,18 @@ typedef struct  s_symbol_list
     char                    type;
 }               t_symbol_list;
 
+/*
+** Structure of symbol data
+*/
 typedef struct  s_symbol
 {
     struct symtab_command   *table;
     t_symbol_list           *list;
 }               t_symbol;
 
+/*
+** Structure of __TEXT, __text section data
+*/
 typedef struct  s_text
 {
     uint64_t    addr;
@@ -92,6 +119,9 @@ typedef struct  s_text
     uint32_t    offset;
 }               t_text;
 
+/*
+** General structure
+*/
 typedef struct  s_env
 {
     struct mach_header_64   *header;
@@ -108,6 +138,7 @@ typedef struct  s_env
         t_symbol            symbol;
     } data;
 }               t_env;
+
 
 /*
 ** CLEAR.C
@@ -199,6 +230,6 @@ void        processSymbol(t_env *env, void *addr, char *obj_name);
 /*
 ** TEXT.C
 */
-void processText(t_env *env, void *addr, char *obj_name);
+void        processText(t_env *env, void *addr, char *obj_name);
 
 #endif

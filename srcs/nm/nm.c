@@ -14,7 +14,7 @@ void init(t_env *env)
 /*
 ** Parse arguments
 ** Allocate an array of char pointer
-** if no args then a.out is use by default
+** If no args then a.out is use by default
 */
 uint16_t parseArgs(t_env *env, int argc, char **argv)
 {
